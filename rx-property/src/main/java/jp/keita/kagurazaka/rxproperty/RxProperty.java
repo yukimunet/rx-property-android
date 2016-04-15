@@ -198,6 +198,18 @@ public class RxProperty<T> implements ReadOnlyRxProperty<T> {
   }
 
   /**
+   * Sets the specified value to this {@code RxProperty}. The change will be notified to observers
+   * of this {@code RxProperty} but not affect bound views.
+   *
+   * @param value a value to set
+   * @param notify will be notified to views
+   * @param emit will be notified to observers
+   */
+  public void setValue(T value, boolean notify, boolean emit) {
+    field.set(value, notify, emit);
+  }
+
+  /**
    * Stops receiving notifications by the source {@link Observable} and send notifications to
    * observers of this {@code RxProperty}.
    */
@@ -295,7 +307,13 @@ public class RxProperty<T> implements ReadOnlyRxProperty<T> {
     }
 
     void set(T value, boolean notify) {
-      parent.emitValue(value);
+      set(value, notify, true);
+    }
+
+    void set(T value, boolean notify, boolean emit) {
+      if (emit) {
+        parent.emitValue(value);
+      }
       if (!compare(value, this.value)) {
         this.value = value;
         if (notify) {
